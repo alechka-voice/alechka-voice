@@ -1,0 +1,465 @@
+:root {
+  --bg-deep: #8f0049;
+  --bg-mid: #b3015b;
+  --fuchsia: #d51b7e;
+  --pink: #ea439d;
+  --pink-soft: #ffb3d6;
+  --white: #fff;
+  /* Liquid glass */
+  --glass: rgba(255, 255, 255, 0.14);
+  --glass-hover: rgba(255, 255, 255, 0.22);
+  --glass-filter: blur(4px) saturate(120%);
+  --glass-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 55%);
+  --glass-ring: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  --glass-drop: 0 8px 24px rgba(110, 0, 55, 0.18);
+  --glow: 0 0 12px rgba(255, 79, 163, 0.55), 0 0 32px rgba(255, 79, 163, 0.35);
+  /* Скругление иконок; у кнопок оно больше на величину отступа */
+  --radius: 14px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: max(40px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+  font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Фиксированная высота строки: смена шрифта после загрузки не меняет высоту карточки */
+  line-height: 1.35;
+  color: var(--white);
+  background: var(--bg-deep);
+  overflow-x: hidden;
+}
+
+/* ---------- Фон ---------- */
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 55% at 50% 30%, var(--pink) 0%, transparent 70%),
+    linear-gradient(170deg, #c40d6d 0%, var(--bg-mid) 60%, var(--bg-deep) 100%);
+}
+
+.bg__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.55;
+  animation: drift 18s ease-in-out infinite alternate;
+}
+
+.bg__blob--1 {
+  width: 60vmax;
+  height: 60vmax;
+  top: -20vmax;
+  left: -25vmax;
+  background: #e0278a;
+}
+
+.bg__blob--2 {
+  width: 50vmax;
+  height: 50vmax;
+  bottom: -20vmax;
+  right: -20vmax;
+  background: #a3004f;
+  animation-duration: 22s;
+}
+
+.bg__blob--3 {
+  width: 30vmax;
+  height: 30vmax;
+  top: 40%;
+  left: 55%;
+  background: #f47fc0;
+  opacity: 0.35;
+  animation-duration: 26s;
+}
+
+@keyframes drift {
+  to { transform: translate3d(6vmax, 4vmax, 0) scale(1.1); }
+}
+
+.floaties {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.floaty {
+  position: absolute;
+  bottom: -40px;
+  left: var(--x);
+  font-size: var(--size);
+  line-height: 1;
+  color: var(--pink-soft);
+  opacity: 0;
+  text-shadow: 0 0 10px rgba(255, 140, 200, 0.9);
+  animation: float-up var(--dur) linear var(--delay) infinite;
+  will-change: transform, opacity;
+}
+
+.floaty--star {
+  color: #fff;
+  text-shadow: 0 0 8px #fff, 0 0 18px var(--pink);
+}
+
+@keyframes float-up {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: var(--alpha); }
+  50%  { transform: translate3d(var(--sway), -55vh, 0) rotate(var(--rot)); }
+  90%  { opacity: var(--alpha); }
+  100% { transform: translate3d(0, -112vh, 0) rotate(calc(var(--rot) * 2)); opacity: 0; }
+}
+
+/* ---------- Карточка ---------- */
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  padding: 16px 0 8px;
+}
+
+/*
+ * Появление при загрузке: задержка каждого элемента берётся из --i.
+ * fill-mode backwards, а не both: иначе финальный transform перебьёт hover.
+ */
+.card [style*="--i"] {
+  animation: rise-in 0.7s var(--ease-pop) backwards;
+  animation-delay: calc(0.2s + var(--i) * 0.1s);
+}
+
+.card .name,
+.card .tagline {
+  animation-name: blur-in;
+  animation-timing-function: var(--ease-out);
+}
+
+@keyframes rise-in {
+  0%   { opacity: 0; transform: translateY(26px) scale(0.94); }
+  100% { transform: none; } /* без opacity: доходим до собственной прозрачности элемента (у «скоро» 0.65) */
+}
+
+@keyframes blur-in {
+  from { opacity: 0; filter: blur(10px); } /* без letter-spacing: иначе строка переносится и прыгает */
+  to   { opacity: 1; filter: blur(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+/* ---------- Профиль ---------- */
+
+.profile {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.avatar {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 18px;
+}
+
+/*
+ * Анимация на фото, а не на всей .avatar: opacity/filter на предке
+ * отключают backdrop-filter у стеклянного значка, и он мигает.
+ */
+.avatar__photo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: avatar-in 0.8s var(--ease-out) 0.15s backwards;
+}
+
+@keyframes avatar-in {
+  from { opacity: 0; transform: scale(0.85); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* Стеклянный ободок вокруг фото, в том же стиле, что и кнопки */
+.avatar::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: var(--glass-gloss), var(--glass);
+  box-shadow: var(--glass-ring), var(--glass-drop);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  animation: fade-in 0.8s var(--ease-out) 0.15s backwards;
+}
+
+.avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar__badge {
+  position: absolute;
+  right: -2px;
+  bottom: 2px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  animation: badge-in 0.5s var(--ease-pop) 0.7s backwards;
+}
+
+@keyframes badge-in {
+  from { opacity: 0; transform: scale(0.4); }
+}
+
+
+.name {
+  margin: 0 0 8px;
+  font-family: "Comfortaa", "Nunito", sans-serif;
+  font-size: clamp(28px, 8vw, 34px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 10px rgba(255, 150, 205, 0.9), 0 0 26px rgba(255, 79, 163, 0.7);
+}
+
+.tagline {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-wrap: balance;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 0 8px rgba(255, 79, 163, 0.6);
+}
+
+/* ---------- Ссылки ---------- */
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  padding: 10px 18px 10px 10px;
+  border-radius: calc(var(--radius) + 10px); /* концентрично иконке: её радиус + отступ */
+  transition: transform 0.3s var(--ease-out), background 0.3s, box-shadow 0.3s;
+}
+
+/* ---------- Liquid glass (кнопки и значок на аватарке) ---------- */
+
+.glass {
+  background: var(--glass);
+  box-shadow: var(--glass-ring), var(--glass-drop);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+/* Глянцевый блик сверху; z-index -1 держит его под контентом (backdrop-filter уже создаёт контекст наложения) */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--glass-gloss);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .link:not(.link--soon):hover {
+    transform: translateY(-2px);
+    background: var(--glass-hover);
+    box-shadow: var(--glass-ring), var(--glass-drop), 0 0 22px rgba(255, 150, 205, 0.55);
+  }
+
+  .link:not(.link--soon):hover .link__arrow {
+    transform: translateX(3px);
+  }
+}
+
+.link:not(.link--soon):focus-visible {
+  box-shadow: var(--glass-ring), var(--glass-drop), 0 0 22px rgba(255, 150, 205, 0.55);
+}
+
+.link:not(.link--soon):active {
+  transform: scale(0.98);
+  background: var(--glass-hover);
+}
+
+.link__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, #fff, var(--pink-soft));
+  box-shadow: 0 0 10px rgba(255, 79, 163, 0.5);
+}
+
+.link__icon svg {
+  width: 22px;
+  height: 22px;
+  fill: var(--fuchsia);
+}
+
+.link__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.link__title,
+.link__sub {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.link__title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.link__sub {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.link__arrow {
+  flex: none;
+  font-size: 26px;
+  line-height: 1;
+  opacity: 0.8;
+  transition: transform 0.25s var(--ease-out);
+}
+
+/* «Скоро» */
+.link--soon {
+  cursor: default;
+  opacity: 0.65;
+}
+
+.link--soon .link__icon {
+  filter: saturate(0.5);
+}
+
+.link__badge {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: lowercase;
+  color: var(--fuchsia);
+  background: #fff;
+}
+
+.link--soon.is-wiggle {
+  animation: wiggle 0.45s ease-in-out;
+}
+
+@keyframes wiggle {
+  20%, 60% { transform: translateX(-4px) rotate(-1deg); }
+  40%, 80% { transform: translateX(4px) rotate(1deg); }
+}
+
+:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ---------- Сердечко и тост ---------- */
+
+.heart {
+  display: inline-block;
+  animation: beat 1.4s ease-in-out infinite;
+}
+
+@keyframes beat {
+  0%, 60%, 100% { transform: scale(1); }
+  20% { transform: scale(1.25); }
+  40% { transform: scale(0.95); }
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 60;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--fuchsia);
+  background: #fff;
+  box-shadow: var(--glow);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 20px);
+  transition: opacity 0.3s, transform 0.3s var(--ease-pop);
+  pointer-events: none;
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 360px) {
+  .card { padding: 8px 0; }
+  .avatar { width: 136px; height: 136px; }
+  .link { gap: 12px; }
+  .link__icon { width: 40px; height: 40px; }
+}
+
+@media (min-height: 820px) {
+  body { align-items: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .floaties { display: none; }
+}
