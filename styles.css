@@ -46,29 +46,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Мягкое исчезновение контента у краёв экрана */
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  pointer-events: none;
-}
-
-body::before {
-  top: 0;
-  height: calc(36px + env(safe-area-inset-top, 0px));
-  background: linear-gradient(to bottom, #c40d6d 0%, rgba(196, 13, 109, 0.65) 30%, rgba(196, 13, 109, 0) 100%);
-}
-
-body::after {
-  bottom: 0;
-  height: calc(36px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(to top, var(--bg-deep) 0%, rgba(143, 0, 73, 0.65) 30%, rgba(143, 0, 73, 0) 100%);
-}
-
 /* ---------- Фон ---------- */
 
 .bg {
@@ -126,6 +103,9 @@ body::after {
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
+  /* Прозрачные края только у частиц: без цветных полос поверх страницы. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 24px, #000 calc(100% - 24px), transparent);
 }
 
 .floaty {
