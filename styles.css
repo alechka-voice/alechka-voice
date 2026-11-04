@@ -34,16 +34,44 @@ body {
   margin: 0;
   min-height: 100vh;
   min-height: 100dvh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: max(40px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
   font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
   /* Фиксированная высота строки: смена шрифта после загрузки не меняет высоту карточки */
   line-height: 1.35;
   color: var(--white);
   background: var(--bg-deep);
   overflow-x: hidden;
+}
+
+/* Обычная прокрутка документа; фон остаётся непрерывным. */
+.page-content {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: max(40px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+}
+
+/* Маска меняет прозрачность контента, не рисуя цвет поверх него.
+   JS привязывает её к видимой области Safari, включая изменение панелей. */
+.edge-fade-ready .page-content,
+.edge-fade-ready .floaties {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  -webkit-mask-size: 100% var(--edge-viewport-height);
+  mask-size: 100% var(--edge-viewport-height);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.edge-fade-ready .page-content {
+  -webkit-mask-position: 0 var(--edge-content-top);
+  mask-position: 0 var(--edge-content-top);
+}
+
+.edge-fade-ready .floaties {
+  -webkit-mask-position: 0 var(--edge-viewport-offset);
+  mask-position: 0 var(--edge-viewport-offset);
 }
 
 /* ---------- Фон ---------- */
@@ -103,9 +131,6 @@ body {
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  /* Прозрачные края только у частиц: без цветных полос поверх страницы. */
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24px, #000 calc(100% - 24px), transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 24px, #000 calc(100% - 24px), transparent);
 }
 
 .floaty {
@@ -457,7 +482,7 @@ body {
 }
 
 @media (min-height: 820px) {
-  body { align-items: center; }
+  .page-content { align-items: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {

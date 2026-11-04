@@ -1,6 +1,36 @@
 (() => {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Плавное исчезновение относительно видимой области, а не высоты документа.
+  // Без JS маска не включается: страница остаётся полностью доступной.
+  const pageContent = document.getElementById("page-content");
+  if (pageContent) {
+    const root = document.documentElement;
+    const viewport = window.visualViewport;
+    let fadeFrame = null;
+    const updateEdgeFade = () => {
+      fadeFrame = null;
+      const offset = viewport ? viewport.offsetTop : 0;
+      const height = viewport ? viewport.height : window.innerHeight;
+      const contentTop = offset - pageContent.getBoundingClientRect().top;
+      root.style.setProperty("--edge-viewport-height", `${height}px`);
+      root.style.setProperty("--edge-content-top", `${contentTop}px`);
+      root.style.setProperty("--edge-viewport-offset", `${offset}px`);
+      root.classList.add("edge-fade-ready");
+    };
+    const scheduleEdgeFade = () => {
+      if (fadeFrame === null) fadeFrame = requestAnimationFrame(updateEdgeFade);
+    };
+    window.addEventListener("scroll", scheduleEdgeFade, { passive: true });
+    window.addEventListener("resize", scheduleEdgeFade, { passive: true });
+    window.addEventListener("pageshow", scheduleEdgeFade);
+    if (viewport) {
+      viewport.addEventListener("scroll", scheduleEdgeFade, { passive: true });
+      viewport.addEventListener("resize", scheduleEdgeFade, { passive: true });
+    }
+    updateEdgeFade();
+  }
+
   // Плавающие сердечки и звёздочки на фоне
   const floaties = document.getElementById("floaties");
   const SYMBOLS = ["♥", "♡", "✦", "✧", "♥", "⋆"];
