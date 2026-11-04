@@ -46,6 +46,29 @@ body {
   overflow-x: hidden;
 }
 
+/* Мягкое исчезновение контента у краёв экрана */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+body::before {
+  top: 0;
+  height: calc(36px + env(safe-area-inset-top, 0px));
+  background: linear-gradient(to bottom, #c40d6d 0%, rgba(196, 13, 109, 0.65) 30%, rgba(196, 13, 109, 0) 100%);
+}
+
+body::after {
+  bottom: 0;
+  height: calc(36px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, var(--bg-deep) 0%, rgba(143, 0, 73, 0.65) 30%, rgba(143, 0, 73, 0) 100%);
+}
+
 /* ---------- Фон ---------- */
 
 .bg {
@@ -275,6 +298,10 @@ body {
   padding: 10px 18px 10px 10px;
   border-radius: calc(var(--radius) + 10px); /* концентрично иконке: её радиус + отступ */
   transition: transform 0.3s var(--ease-out), background 0.3s, box-shadow 0.3s;
+}
+
+.link[hidden] {
+  display: none;
 }
 
 /* ---------- Liquid glass (кнопки и значок на аватарке) ---------- */
